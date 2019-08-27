@@ -2,11 +2,12 @@ package limiter
 
 import (
 	"errors"
-	"git.code.oa.com/cloud_industry/boss/job/conf"
-	"git.code.oa.com/cloud_industry/boss/job/data"
-	"github.com/gomodule/redigo/redis"
+	// "git.code.oa.com/cloud_industry/boss/job/conf"
 	"sync"
 	"time"
+
+	"github.com/ApiRequestLimiter/data"
+	"github.com/gomodule/redigo/redis"
 )
 
 var limiterAgent *LimiterAgent
@@ -14,16 +15,16 @@ var once sync.Once
 
 type LimiterValue struct {
 	MaxPermits string
-	Rate string
+	Rate       string
 }
 
 type LimiterAgent struct {
-	spec LimiterValue
-	pool *redis.Pool
+	spec   LimiterValue
+	pool   *redis.Pool
 	script *redis.Script
 }
 
-func GLimiterAgent() *LimiterAgent{
+func GLimiterAgent() *LimiterAgent {
 	once.Do(func() {
 		limiterAgent = NewLimiterAgent()
 	})
@@ -50,7 +51,7 @@ func NewLimiterAgent() *LimiterAgent {
 
 //入口
 //先获得锁，再处理
-func (l *LimiterAgent) HandleRequest(user string, numRequest int64) (bool, error){
+func (l *LimiterAgent) HandleRequest(user string, numRequest int64) (bool, error) {
 	lockKey := getLimiterLockKey(user)
 
 	for {
@@ -64,7 +65,7 @@ func (l *LimiterAgent) HandleRequest(user string, numRequest int64) (bool, error
 		}
 	}
 
-	result, err := l.DoLimit(user, numRequest,time.Now().UnixNano())
+	result, err := l.DoLimit(user, numRequest, time.Now().UnixNano())
 	if err != nil {
 		return false, err
 	}
@@ -85,7 +86,7 @@ func (l *LimiterAgent) DoLimit(user string, numRequest int64, currNanoSec int64)
 	key := getLimiterKey(user)
 	value, err := l.script.Do(conn, key, currNanoSec, numRequest, l.spec.MaxPermits, l.spec.Rate)
 	if err != nil {
-		return  false, err
+		return false, err
 	}
 	if value != nil {
 		return true, nil
@@ -115,6 +116,3 @@ func (l *LimiterAgent) limiterUnLock(lockKey string) error {
 	}
 	return nil
 }
-
-
-
