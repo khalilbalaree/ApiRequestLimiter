@@ -2,10 +2,10 @@ package limiter
 
 import (
 	"errors"
-	// "git.code.oa.com/cloud_industry/boss/job/conf"
 	"sync"
 	"time"
 
+	"github.com/ApiRequestLimiter/conf"
 	"github.com/ApiRequestLimiter/data"
 	"github.com/gomodule/redigo/redis"
 )
@@ -39,7 +39,6 @@ func NewLimiterAgent() *LimiterAgent {
 
 	limiterAgent := &LimiterAgent{
 		spec: LimiterValue{
-			//配置文件中读取
 			MaxPermits: conf.GetLimiter().MaxPermits,
 			Rate:       conf.GetLimiter().Rate,
 		},

@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"git.code.oa.com/cloud_industry/boss/job/limiter"
+	"github.com/ApiRequestLimiter"
 )
 
 func TestLimiterAgent_HandleRequest(t *testing.T) {
