@@ -12,7 +12,7 @@ local currPermits = tonumber(redis.call("HGET", key, "currPermits"))
 
 if (lastNanoSec == nil) then
     redis.call("HSET", key, "lastNanoSec", currNanoSec)
-    redis.call("HSET", key, "currPermits", maxPermits-1)
+    redis.call("HSET", key, "currPermits", maxPermits-numRequest)
     return true
 end
 
